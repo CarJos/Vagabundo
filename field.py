@@ -17,4 +17,4 @@ class Field:
         self.homeless_coordinates[homeless] = new_coordinate
     
     def get_coordinate(self, homeless):
-        
+        return self.homeless_coordinates[homeless]
