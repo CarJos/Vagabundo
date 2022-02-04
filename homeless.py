@@ -37,7 +37,7 @@ class LeftHomeless(Homeless):
         super().__init__(name)
 
     def walk(self):
-        dx, dy = random.choice([(-5,0), (-1,0), (0,1), (0,1)])
+        dx, dy = random.choice([(1,0), (-5,0), (0,1), (0,1)])
         self.x += dx
         self.y += dy
         return [self.x, self.y]
