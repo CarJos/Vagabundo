@@ -1,32 +1,51 @@
-from homeless import StandardHomeless
+from homeless import Homeless, StandardHomeless, ModerateHomeless, LeftHomeless
 from field import Field
 from coordinate import Coordinate
 
 from bokeh.plotting import figure, output_file, show
 
-def hike(homeless, field, step):
-    begin = field.get_coordinate(homeless)
-    for _ in range(step):
-        field.move_homeless(homeless)
+def know_type_homeless(homeless_type):
+    if homeless_type.__name__ == StandardHomeless:
+        return "Vagabundo Estandar"
+    elif homeless_type.__name__ == ModerateHomeless:
+        return "Vagabundo Moderado"
+    else:
+        return "Vagabundo Izquierdo"
 
-    return begin.distance(field.get_coordinate(homeless))
+def hike(homeless_type, field, step):
+    begin = [homeless.position()]
+    x_graph = [0]
+    y_graph = [0]
+    for _ in range(step-1):
+        homeless.walk()
+        x, y = homeless.position()
+        x_graph.append(x)
+        y_graph.append(y)
+    know_homeless = know_type_homeless(homeless_type)
+    graph(x_graph,y_graph,know_homeless,step)
+    return homeless.distance_origin()
 
 def simulate_hike(step, attemps, homeless_type):
-    homeless = homeless_type(name='Ivan')
-    begin = Coordinate(0,0)
+    homeless = []
     distance = []
 
-    for _ in range(attemps):
-        field = Field()
-        field.add_homeless(homeless, begin)
-        simulation_hike = hike(homeless, field, step)
-        distance.append(round(simulation_hike,1))
-    
+    for i in range(attemps):
+        homeless.append(homeless_type(name=f"Rasta Cuando {i}"))
+        emulate_walk = hike(homeless[i],step,homeless_type)
+        distance.append(round(emulate_walk,1))
+        
     return distance
 
-def graph(x,y):
-    paint = figure(title="Camino Aleatorio", x_axis_label="Pasos", y_axis_label="Distancia")
-    paint.line(x, y, legend_label="Distancia")
+def graph(x_graph,y_graph, know, step):
+    paint = figure(title=know, x_axis_label="Pasos", y_axis_label="Distancia")
+    paint.line(x_graph, y_graph, legend_label=str(step)+"pasos")
+    final_x = x_graph[-1]
+    final_y = y_graph[-1]
+    paint.diamond_cross(0,0, fill_color="green", line_color="green",size=18)
+    paint.diamond_cross(final_x,final_y, fill_color="red", line_color="red",size=18)
+    final_stretch_x = [0, final_x]
+    final_stretch_y = [0, final_y]
+    graph.line(final_stretch_x,final_stretch_y, line_width=2, color="blue")
     show(paint)
 
 def main(walk_distance, attemps, homeless_type):
